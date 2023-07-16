@@ -1,0 +1,67 @@
+name: Pipeline Deployment
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-22.04
+    name: Build and Push
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Auth to GCP
+        id: auth
+        uses: google-github-actions/auth@v1
+        with :
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Auth Docker
+        run: |
+          gcloud --quiet auth configure-docker
+
+      - name: Build image
+        run: |
+          docker build -t asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/sifood-srikandi-dashboard:${GITHUB_SHA::7} .
+
+      - name: Push image
+        run: |
+          docker push asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/sifood-srikandi-dashboard:${GITHUB_SHA::7}
+  
+  deploy-full:
+    name: Deploy full
+    runs-on: ubuntu-22.04
+    needs:
+      - build-and-push
+    steps:
+      - uses: actions/checkout@v3
+      - name: Auth to GCP
+        id: auth
+        uses: google-github-actions/auth@v1
+        with :
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Get GKE Credentials
+        id: 'get-credentials'
+        uses: 'google-github-actions/get-gke-credentials@v1'
+        with:
+          cluster_name: ${{ secrets.GCP_GKE_NAME }}
+          location: asia-southeast2
+
+      - name: Generate env application
+        run: |
+          echo "PRODUCT_URI=${{ secrets.ENV_PRODUCT_URI }}" >> .env
+          echo "REVIEW_URI=${{ secrets.ENV_REVIEW_URI }}" >> .env
+
+      - name: Deploy full
+        run: |
+          sed -i "s;IMAGE;asia.gcr.io/${{ secrets.GCP_PROJECT_ID }}/sifood-srikandi-dashboard:${GITHUB_SHA::7};g" _deployment/d-full.yaml
+          kubectl delete secret sifood-srikandi-dashboard --ignore-not-found
+          kubectl create secret generic sifood-srikandi-dashboard --from-env-file .env
+          kubectl apply -f _deployment/d-full.yaml
