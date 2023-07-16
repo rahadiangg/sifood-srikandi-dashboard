@@ -6,7 +6,6 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: sifood-srikandi-dashboard
       type: canary
   template:
     metadata:
