@@ -72,8 +72,8 @@ spec:
     - destination:
         host: sifood-srikandi-dashboard.default.svc.cluster.local
         subset: full
-      weight: 60 
+      weight: 70 
     - destination:
         host: sifood-srikandi-dashboard.default.svc.cluster.local
         subset: canary
-      weight: 40
+      weight: 30
