@@ -36,6 +36,7 @@ jobs:
   deploy-full:
     name: Deploy full
     runs-on: ubuntu-22.04
+    environment: prod
     needs:
       - build-and-push
     steps:
