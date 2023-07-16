@@ -6,16 +6,16 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: sifood-srikandi-dashboard-canary
+      app: sifood-srikandi-dashboard
       type: canary
   template:
     metadata:
       labels:
-        app: sifood-srikandi-dashboard-canary
+        app: sifood-srikandi-dashboard
         type: canary
     spec:
       containers:
-      - name: sifood-srikandi-dashboard-canary
+      - name: sifood-srikandi-dashboard
         image: IMAGE
         resources:
           limits:
@@ -73,8 +73,8 @@ spec:
     - destination:
         host: sifood-srikandi-dashboard.default.svc.cluster.local
         subset: full
-      weight: 80 
+      weight: 60 
     - destination:
         host: sifood-srikandi-dashboard.default.svc.cluster.local
         subset: canary
-      weight: 20 
+      weight: 40
