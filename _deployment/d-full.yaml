@@ -54,7 +54,7 @@ spec:
   - name: full # DNS-1123 label naming conventions
     labels:
       type: full
-  - name: full # DNS-1123 label naming conventions
+  - name: canary # DNS-1123 label naming conventions
     labels:
       type: canary
 
