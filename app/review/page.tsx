@@ -47,7 +47,7 @@ export default async function Review() {
     return (
       <tr className="border-b dark:border-neutral-500" key={p.id}>
         <td className="whitespace-nowrap  px-6 py-4 font-medium">{i}</td>
-        <td className="whitespace-nowrap  px-6 py-4">{p.customer_name}</td>
+        <td className="whitespace-nowrap  px-6 py-4 font-medium">{p.customer_name}</td>
         <td className="whitespace-nowrap  px-6 py-4">{p.review}</td>
         {p.star ? (
 
